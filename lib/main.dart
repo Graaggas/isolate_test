@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,6 +34,41 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  ReceivePort? receivePort;
+  Isolate? isolate;
+  SendPort? isolateSendPort;
+
+  @override
+  void initState() {
+    super.initState();
+
+    spawnIsolate();
+  }
+
+  static void remoteIsolate(SendPort sendPort) {
+    ReceivePort isolateReceivePort = ReceivePort();
+    sendPort.send(isolateReceivePort.sendPort);
+    isolateReceivePort.listen((message) {
+      final parsedNum = int.parse(message);
+      final result = sieveOfEratosthenes(parsedNum);
+      sendPort.send(result);
+    });
+  }
+
+  Future spawnIsolate() async {
+    receivePort = ReceivePort();
+    isolate = await Isolate.spawn(remoteIsolate, receivePort!.sendPort,
+        debugName: "remoteIsolate");
+  }
+
+  @override
+  void dispose() {
+    if (isolate != null) {
+      isolate!.kill();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,25 +94,26 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              widget.outputText.isEmpty
-                  ? 'Enter number to calculate'
-                  : 'Prime numbers: ${widget.outputText}',
-              maxLines: 10,
-            ),
-          )
+          StreamBuilder(
+            stream: receivePort,
+            initialData: "NoData",
+            builder: (BuildContext context, AsyncSnapshot snapshot) {
+              if (snapshot.data is SendPort) {
+                isolateSendPort = snapshot.data;
+              }
+              return Text(
+                snapshot.data.toString(),
+              );
+            },
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.calculate),
         onPressed: () {
-          sieveOfEratosthenes(int.parse(widget.inputTextFieldController.text));
+          isolateSendPort?.send(widget.inputTextFieldController.text);
           setState(() {
-            final listOfPrimes = sieveOfEratosthenes(
-                int.parse(widget.inputTextFieldController.text));
-            widget.outputText = listOfPrimes.toString();
+            widget.outputText = 'listOfPrimes.toString()';
           });
         },
       ),
