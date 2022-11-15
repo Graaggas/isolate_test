@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
 
 class HomeScreen extends StatefulWidget {
   final inputTextFieldController = TextEditingController();
-  var outputText = '11';
+  var outputText = '';
 
   HomeScreen({Key? key}) : super(key: key);
 
