@@ -1,4 +1,5 @@
 import 'package:db_isolate_test/services/isolate_service.dart';
+import 'package:elementary/elementary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -33,19 +34,31 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final isolateService = IsolateService();
+  final calculatedResult = EntityStateNotifier<int?>();
+  Duration? executionTime = Duration.zero;
+
+  EntityStateNotifier<int?> get result => calculatedResult;
 
   @override
   void initState() {
+    calculatedResult.content(null);
     super.initState();
   }
 
   @override
   void dispose() {
+    calculatedResult.dispose();
+    result.dispose();
+
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    const textStyle = TextStyle(
+      fontWeight: FontWeight.w400,
+      fontSize: 18,
+    );
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -69,13 +82,29 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          EntityStateNotifierBuilder<int?>(
+            listenableEntityState: result,
+            loadingBuilder: (_, __) => const CircularProgressIndicator(),
+            builder: (_, primes) => primes == null
+                ? const Text('Tap on FAB to calculate', style: textStyle)
+                : Text(
+                    '${primes.toString()} primes - $executionTime',
+                    style: textStyle,
+                  ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.calculate),
         onPressed: () {
-          isolateService
+          Stopwatch stopWatch = Stopwatch()..start();
+          calculatedResult.loading();
+          final calculatedValue = isolateService
               .calculate(int.parse(widget.inputTextFieldController.text));
+          calculatedValue.then((value) {
+            executionTime = stopWatch.elapsed;
+            calculatedResult.content(value);
+          });
         },
       ),
     );

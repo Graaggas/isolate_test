@@ -1,25 +1,30 @@
+import 'dart:async';
 import 'dart:isolate';
-
-import 'package:flutter/foundation.dart';
 
 class IsolateService {
   late ReceivePort receivePort;
 
   IsolateService();
 
-  Future<void> calculate(int n) async {
+  Future<int> calculate(int n) async {
+    final resultCompleter = Completer<int>();
+    resultCompleter.future;
+
     final receivePort = ReceivePort();
     final dataBundle = {
       'port': receivePort.sendPort,
       'data': n,
     };
-    await Isolate.spawn(heavyFunction, dataBundle);
+    final isolate = await Isolate.spawn(heavyFunction, dataBundle);
 
     receivePort.listen((message) {
-      if (message is List<int>) {
-        debugPrint('==> $message');
+      if (message is int) {
+        isolate.kill(priority: Isolate.immediate);
+        return resultCompleter.complete(message);
       }
     });
+
+    return resultCompleter.future;
   }
 }
 
@@ -29,7 +34,7 @@ void heavyFunction(Map<String, dynamic> map) {
 
   final primes = sieveOfEratosthenes(n);
 
-  port.send(primes);
+  port.send(primes.length);
 }
 
 List<int> sieveOfEratosthenes(int n) {
