@@ -1,5 +1,4 @@
-import 'dart:isolate';
-
+import 'package:db_isolate_test/services/isolate_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,7 +24,6 @@ class MyApp extends StatelessWidget {
 
 class HomeScreen extends StatefulWidget {
   final inputTextFieldController = TextEditingController();
-  var outputText = '';
 
   HomeScreen({Key? key}) : super(key: key);
 
@@ -34,38 +32,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  ReceivePort? receivePort;
-  Isolate? isolate;
-  SendPort? isolateSendPort;
+  final isolateService = IsolateService();
 
   @override
   void initState() {
     super.initState();
-
-    spawnIsolate();
-  }
-
-  static void remoteIsolate(SendPort sendPort) {
-    ReceivePort isolateReceivePort = ReceivePort();
-    sendPort.send(isolateReceivePort.sendPort);
-    isolateReceivePort.listen((message) {
-      final parsedNum = int.parse(message);
-      final result = sieveOfEratosthenes(parsedNum);
-      sendPort.send(result);
-    });
-  }
-
-  Future spawnIsolate() async {
-    receivePort = ReceivePort();
-    isolate = await Isolate.spawn(remoteIsolate, receivePort!.sendPort,
-        debugName: "remoteIsolate");
   }
 
   @override
   void dispose() {
-    if (isolate != null) {
-      isolate!.kill();
-    }
     super.dispose();
   }
 
@@ -94,48 +69,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          StreamBuilder(
-            stream: receivePort,
-            initialData: "NoData",
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.data is SendPort) {
-                isolateSendPort = snapshot.data;
-              }
-              return Text(
-                snapshot.data.toString(),
-              );
-            },
-          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.calculate),
         onPressed: () {
-          isolateSendPort?.send(widget.inputTextFieldController.text);
-          setState(() {
-            widget.outputText = 'listOfPrimes.toString()';
-          });
+          isolateService
+              .calculate(int.parse(widget.inputTextFieldController.text));
         },
       ),
     );
   }
-}
-
-List<int> sieveOfEratosthenes(int n) {
-  final primes = List<bool>.filled(n + 1, true);
-  for (var i = 2; i * i < n; i++) {
-    if (primes[i]) {
-      for (var j = i * i; j <= n; j += i) {
-        primes[j] = false;
-      }
-    }
-  }
-  final res = <int>[];
-  for (var i = 2; i <= n; i++) {
-    if (primes[i]) {
-      res.add(i);
-    }
-  }
-
-  return res;
 }
