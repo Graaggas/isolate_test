@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:db_isolate_test/services/database/database.dart';
 import 'package:db_isolate_test/services/isolate_service.dart';
 import 'package:elementary/elementary.dart';
 import 'package:flutter/material.dart';
@@ -33,8 +36,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final databaseStreamController = StreamController<List<Measure>>();
+  final database = Database();
   final isolateService = IsolateService();
   final calculatedResult = EntityStateNotifier<int?>();
+
+  var initialData = <Measure>[];
+
   Duration? executionTime = Duration.zero;
 
   EntityStateNotifier<int?> get result => calculatedResult;
@@ -48,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     calculatedResult.dispose();
+    databaseStreamController.close();
     result.dispose();
 
     super.dispose();
@@ -92,21 +101,57 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: textStyle,
                   ),
           ),
+          const SizedBox(height: 24),
+          StreamBuilder<List<Measure>>(
+              initialData: initialData,
+              stream: databaseStreamController.stream,
+              builder: (_, snapshot) {
+                if (snapshot.hasData) {
+                  final data = snapshot.data!;
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      itemBuilder: (_, index) => Text(
+                          '${data[index].id}: ${data[index].number}, ${data[index].amount}, ${data[index].timer}'),
+                      separatorBuilder: (_, __) => const Text('----'),
+                      itemCount: snapshot.data!.length,
+                    ),
+                  );
+                } else {
+                  return const Center(
+                    child: Text('Table is empty'),
+                  );
+                }
+              }),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.calculate),
         onPressed: () {
           Stopwatch stopWatch = Stopwatch()..start();
+          final number = widget.inputTextFieldController.text;
           calculatedResult.loading();
-          final calculatedValue = isolateService
-              .calculate(int.parse(widget.inputTextFieldController.text));
-          calculatedValue.then((value) {
+          final calculatedValue = isolateService.calculate(int.parse(number));
+          calculatedValue.then((value) async {
             executionTime = stopWatch.elapsed;
             calculatedResult.content(value);
+
+            await database.insertData(
+              number: number,
+              amount: value.toString(),
+              timer: executionTime.toString(),
+            );
+            final result = await database.getMeasures();
+            databaseStreamController.sink.add(result);
           });
         },
       ),
     );
+  }
+
+  Future<void> getInitialData() async {
+    final initialDataFromDatabase = await database.getMeasures();
+    databaseStreamController.sink.add(initialDataFromDatabase);
   }
 }

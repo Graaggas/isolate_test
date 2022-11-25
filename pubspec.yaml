@@ -37,8 +37,15 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   elementary: ^1.5.0
+  drift: ^2.2.0
+  sqlite3_flutter_libs: ^0.5.12
+  path_provider: ^2.0.11
+  path: ^1.8.2
+
 
 dev_dependencies:
+  drift_dev: ^2.2.0+1
+  build_runner: ^2.3.2
   flutter_test:
     sdk: flutter
 
