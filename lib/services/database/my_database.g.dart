@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'database.dart';
+part of 'my_database.dart';
 
 // **************************************************************************
 // DriftDatabaseGenerator
@@ -248,9 +248,9 @@ class $MeasuresTable extends Measures with TableInfo<$MeasuresTable, Measure> {
   }
 }
 
-abstract class _$Database extends GeneratedDatabase {
-  _$Database(QueryExecutor e) : super(e);
-  _$Database.connect(DatabaseConnection c) : super.connect(c);
+abstract class _$MyDatabase extends GeneratedDatabase {
+  _$MyDatabase(QueryExecutor e) : super(e);
+  _$MyDatabase.connect(DatabaseConnection c) : super.connect(c);
   late final $MeasuresTable measures = $MeasuresTable(this);
   @override
   Iterable<TableInfo<Table, dynamic>> get allTables =>

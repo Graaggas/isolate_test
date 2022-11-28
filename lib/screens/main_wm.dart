@@ -1,6 +1,6 @@
 import 'package:db_isolate_test/screens/main_model.dart';
 import 'package:db_isolate_test/screens/main_screen.dart';
-import 'package:db_isolate_test/services/database/database.dart';
+import 'package:db_isolate_test/services/database/my_database.dart';
 import 'package:elementary/elementary.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -20,7 +20,16 @@ class MainWM extends WidgetModel<MainScreen, MainModel> {
         fontSize: 18,
       );
 
-  void onCalculateTap() => model.onCalculateTap(inputTextFieldController.text);
+  void clearTable() => model.clearTable();
+  void onCalculateTap() {
+    final text = inputTextFieldController.text;
+
+    if (text.isNotEmpty) {
+      model.onCalculateTap(inputTextFieldController.text);
+    } else {
+      calculatedResult.content(0);
+    }
+  }
 
   MainWM({
     required MainModel model,

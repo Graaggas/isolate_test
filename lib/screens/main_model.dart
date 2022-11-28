@@ -1,12 +1,15 @@
 import 'dart:async';
 
-import 'package:db_isolate_test/services/database/database.dart';
+import 'package:db_isolate_test/services/database/my_database.dart';
+import 'package:db_isolate_test/services/isolate_db_service.dart';
 import 'package:db_isolate_test/services/isolate_service.dart';
 import 'package:elementary/elementary.dart';
 
 class MainModel extends ElementaryModel {
-  final database = Database();
+  late final MyDatabase database;
   final isolateService = IsolateService();
+  final dbConnectionInIsolate =
+      const IsolateDBService().createDriftIsolateAndConnect();
 
   final _databaseStreamController = StreamController<List<Measure>>();
   final _calculatedResult = EntityStateNotifier<int?>();
@@ -18,9 +21,17 @@ class MainModel extends ElementaryModel {
   Stream<List<Measure>> get databaseStream => _databaseStreamController.stream;
 
   @override
-  void init() async {
+  Future<void> init() async {
+    database = await _getDB();
     await _onInit();
     super.init();
+  }
+
+  Future<void> clearTable() async {
+    await database.clearTable();
+
+    final updatedDatabaseData = await database.getMeasures();
+    _databaseStreamController.sink.add(updatedDatabaseData);
   }
 
   void onCalculateTap(String number) {
@@ -45,4 +56,16 @@ class MainModel extends ElementaryModel {
     final initData = await database.getMeasures();
     _databaseStreamController.sink.add(initData);
   }
+
+  Future<MyDatabase> _getDB() async {
+    // final isolate = await DriftIsolate.spawn(_backgroundConnection);
+    // final connection = await isolate.connect();
+
+    return MyDatabase.connect(dbConnectionInIsolate);
+  }
+
+  // DatabaseConnection _backgroundConnection() {
+  //   final database = NativeDatabase.memory();
+  //   return DatabaseConnection(database);
+  // }
 }

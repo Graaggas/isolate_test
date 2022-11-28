@@ -1,5 +1,5 @@
 import 'package:db_isolate_test/screens/main_wm.dart';
-import 'package:db_isolate_test/services/database/database.dart';
+import 'package:db_isolate_test/services/database/my_database.dart';
 import 'package:elementary/elementary.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +14,16 @@ class MainScreen extends ElementaryWidget<MainWM> {
   @override
   Widget build(MainWM wm) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: wm.clearTable,
+            icon: const Icon(
+              Icons.delete_rounded,
+            ),
+          )
+        ],
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -52,24 +61,83 @@ class MainScreen extends ElementaryWidget<MainWM> {
             ),
           ),
           const SizedBox(height: 24),
+          Table(
+            border: const TableBorder(
+              bottom: BorderSide(
+                width: 1,
+                color: Colors.grey,
+                style: BorderStyle.solid,
+              ),
+            ),
+            columnWidths: const {
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(2),
+              2: FlexColumnWidth(4),
+            },
+            children: const [
+              TableRow(
+                children: [
+                  TableCell(
+                    child: Center(
+                      child: Text('number'),
+                    ),
+                  ),
+                  TableCell(
+                    child: Center(
+                      child: Text('primes\namount'),
+                    ),
+                  ),
+                  TableCell(
+                    child: Center(
+                      child: Text('execution time'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
           Expanded(
             child: StreamBuilder<List<Measure>>(
                 stream: wm.databaseStream,
                 builder: (_, snapshot) {
                   if (snapshot.hasData) {
                     final data = snapshot.data!;
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SingleChildScrollView(
+                    return SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: ListView.builder(
+                        shrinkWrap: true,
                         physics: const ClampingScrollPhysics(),
-                        child: ListView.separated(
-                          shrinkWrap: true,
-                          physics: const ClampingScrollPhysics(),
-                          itemBuilder: (_, index) => Text(
-                              '${data[index].id}: ${data[index].number}, ${data[index].amount}, ${data[index].timer}'),
-                          separatorBuilder: (_, __) => const Text('----'),
-                          itemCount: snapshot.data!.length,
+                        itemBuilder: (_, index) => Table(
+                          border: const TableBorder(
+                            bottom: BorderSide(
+                                width: 1,
+                                color: Colors.grey,
+                                style: BorderStyle.solid),
+                          ),
+                          columnWidths: const {
+                            0: FlexColumnWidth(2),
+                            1: FlexColumnWidth(2),
+                            2: FlexColumnWidth(4),
+                          },
+                          children: [
+                            TableRow(
+                              children: [
+                                TableCell(
+                                  child:
+                                      Center(child: Text(data[index].number)),
+                                ),
+                                TableCell(
+                                  child:
+                                      Center(child: Text(data[index].amount)),
+                                ),
+                                TableCell(
+                                  child: Center(child: Text(data[index].timer)),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
+                        itemCount: snapshot.data!.length,
                       ),
                     );
                   } else {

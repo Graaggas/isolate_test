@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
-part 'database.g.dart';
+part 'my_database.g.dart';
 
 class Measures extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -15,11 +11,21 @@ class Measures extends Table {
 }
 
 @DriftDatabase(tables: [Measures])
-class Database extends _$Database {
-  Database() : super(_openConnection());
+class MyDatabase extends _$MyDatabase {
+  MyDatabase() : super(NativeDatabase.memory());
+
+  MyDatabase.connect(DatabaseConnection connection) : super.connect(connection);
 
   @override
   int get schemaVersion => 1;
+
+  Future<void> clearTable() async {
+    return transaction(() async {
+      for (final table in allTables) {
+        await delete(table).go();
+      }
+    });
+  }
 
   Future<void> insertData({
     required String number,
@@ -35,12 +41,4 @@ class Database extends _$Database {
       );
 
   Future<List<Measure>> getMeasures() => select(measures).get();
-}
-
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'database.db'));
-    return NativeDatabase(file);
-  });
 }
