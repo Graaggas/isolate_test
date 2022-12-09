@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:db_isolate_test/services/database/my_database.dart';
 import 'package:db_isolate_test/services/isolate_db_service.dart';
 import 'package:db_isolate_test/services/isolate_service.dart';
+import 'package:db_isolate_test/services/prefs_helper.dart';
 import 'package:elementary/elementary.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 class MainModel extends ElementaryModel {
   late final MyDatabase database;
@@ -20,6 +23,10 @@ class MainModel extends ElementaryModel {
   Duration? get executionTime => _executionTime;
   Stream<List<Measure>> get databaseStream => _databaseStreamController.stream;
 
+  final _isolateUseState = ValueNotifier<bool>(false);
+
+  ValueListenable<bool> get isolateUseState => _isolateUseState;
+
   @override
   Future<void> init() async {
     database = await _getDB();
@@ -32,6 +39,12 @@ class MainModel extends ElementaryModel {
 
     final updatedDatabaseData = await database.getMeasures();
     _databaseStreamController.sink.add(updatedDatabaseData);
+  }
+
+  Future<void> changeIsolateToggle(bool value) async {
+    await PrefsHelper.saveData(value);
+
+    _isolateUseState.value = value;
   }
 
   void onCalculateTap(String number) {
@@ -55,17 +68,11 @@ class MainModel extends ElementaryModel {
   Future<void> _onInit() async {
     final initData = await database.getMeasures();
     _databaseStreamController.sink.add(initData);
+
+    _isolateUseState.value = await PrefsHelper.getData();
   }
 
   Future<MyDatabase> _getDB() async {
-    // final isolate = await DriftIsolate.spawn(_backgroundConnection);
-    // final connection = await isolate.connect();
-
     return MyDatabase.connect(dbConnectionInIsolate);
   }
-
-  // DatabaseConnection _backgroundConnection() {
-  //   final database = NativeDatabase.memory();
-  //   return DatabaseConnection(database);
-  // }
 }

@@ -21,7 +21,20 @@ class MainScreen extends ElementaryWidget<MainWM> {
             icon: const Icon(
               Icons.delete_rounded,
             ),
-          )
+          ),
+          const SizedBox(width: 16),
+          const Align(
+            child: Text('Use isolates: '),
+          ),
+          ValueListenableBuilder<bool>(
+            valueListenable: wm.isolateUseState,
+            builder: (_, state, __) => CupertinoSwitch(
+              activeColor: Colors.purple,
+              trackColor: Colors.grey,
+              value: state,
+              onChanged: wm.changeIsolateToggle,
+            ),
+          ),
         ],
       ),
       body: Column(
