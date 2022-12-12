@@ -13,6 +13,8 @@ class MainWM extends WidgetModel<MainScreen, MainModel> {
   final inputTextFieldController = TextEditingController();
   EntityStateNotifier<int?> get calculatedResult => model.calculatedResult;
 
+  ValueListenable<bool> get isFabAvailable => model.isFabAvailable;
+
   Stream<List<Measure>> get databaseStream => model.databaseStream;
 
   ValueListenable<bool> get isolateUseState => model.isolateUseState;

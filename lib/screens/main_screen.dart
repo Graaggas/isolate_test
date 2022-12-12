@@ -162,9 +162,14 @@ class MainScreen extends ElementaryWidget<MainWM> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.calculate),
-        onPressed: () => wm.onCalculateTap(),
+      floatingActionButton: ValueListenableBuilder<bool>(
+        valueListenable: wm.isFabAvailable,
+        builder: (_, isAvailable, __) => isAvailable
+            ? FloatingActionButton(
+                child: const Icon(Icons.calculate),
+                onPressed: () => wm.onCalculateTap(),
+              )
+            : const SizedBox.shrink(),
       ),
     );
   }
