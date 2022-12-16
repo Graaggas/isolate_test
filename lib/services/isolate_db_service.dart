@@ -4,7 +4,6 @@ import 'dart:isolate';
 import 'package:drift/drift.dart';
 import 'package:drift/isolate.dart';
 import 'package:drift/native.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
@@ -23,8 +22,6 @@ class IsolateDBService {
   }
 
   Future<DriftIsolate> _createDriftIsolate() async {
-    debugPrint('==> init drift in isolate');
-
     final dir = await getApplicationDocumentsDirectory();
     final path = p.join(dir.path, 'db.sqlite');
     final receivePort = ReceivePort();
