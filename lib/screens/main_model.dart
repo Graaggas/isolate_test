@@ -11,8 +11,7 @@ import 'package:flutter/foundation.dart';
 class MainModel extends ElementaryModel {
   late final MyDatabase database;
   final isolateService = IsolateService();
-  final dbConnectionInIsolate =
-      const IsolateDBService().createDriftIsolateAndConnect();
+  final dbConnectionInIsolate = const IsolateDBService().createDriftIsolateAndConnect();
 
   final _databaseStreamController = StreamController<List<Measure>>();
   final _calculatedResult = EntityStateNotifier<int?>();

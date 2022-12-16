@@ -13,10 +13,7 @@ class Measure extends DataClass implements Insertable<Measure> {
   final String amount;
   final String timer;
   const Measure(
-      {required this.id,
-      required this.number,
-      required this.amount,
-      required this.timer});
+      {required this.id, required this.number, required this.amount, required this.timer});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -36,8 +33,7 @@ class Measure extends DataClass implements Insertable<Measure> {
     );
   }
 
-  factory Measure.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
+  factory Measure.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return Measure(
       id: serializer.fromJson<int>(json['id']),
@@ -57,8 +53,7 @@ class Measure extends DataClass implements Insertable<Measure> {
     };
   }
 
-  Measure copyWith({int? id, String? number, String? amount, String? timer}) =>
-      Measure(
+  Measure copyWith({int? id, String? number, String? amount, String? timer}) => Measure(
         id: id ?? this.id,
         number: number ?? this.number,
         amount: amount ?? this.amount,
@@ -121,10 +116,7 @@ class MeasuresCompanion extends UpdateCompanion<Measure> {
   }
 
   MeasuresCompanion copyWith(
-      {Value<int>? id,
-      Value<String>? number,
-      Value<String>? amount,
-      Value<String>? timer}) {
+      {Value<int>? id, Value<String>? number, Value<String>? amount, Value<String>? timer}) {
     return MeasuresCompanion(
       id: id ?? this.id,
       number: number ?? this.number,
@@ -170,25 +162,21 @@ class $MeasuresTable extends Measures with TableInfo<$MeasuresTable, Measure> {
   $MeasuresTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-      'id', aliasedName, false,
+  late final GeneratedColumn<int> id = GeneratedColumn<int>('id', aliasedName, false,
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultConstraints: 'PRIMARY KEY AUTOINCREMENT');
   final VerificationMeta _numberMeta = const VerificationMeta('number');
   @override
-  late final GeneratedColumn<String> number = GeneratedColumn<String>(
-      'number', aliasedName, false,
+  late final GeneratedColumn<String> number = GeneratedColumn<String>('number', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   final VerificationMeta _amountMeta = const VerificationMeta('amount');
   @override
-  late final GeneratedColumn<String> amount = GeneratedColumn<String>(
-      'amount', aliasedName, false,
+  late final GeneratedColumn<String> amount = GeneratedColumn<String>('amount', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   final VerificationMeta _timerMeta = const VerificationMeta('timer');
   @override
-  late final GeneratedColumn<String> timer = GeneratedColumn<String>(
-      'timer', aliasedName, false,
+  late final GeneratedColumn<String> timer = GeneratedColumn<String>('timer', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns => [id, number, amount, timer];
@@ -197,28 +185,24 @@ class $MeasuresTable extends Measures with TableInfo<$MeasuresTable, Measure> {
   @override
   String get actualTableName => 'measures';
   @override
-  VerificationContext validateIntegrity(Insertable<Measure> instance,
-      {bool isInserting = false}) {
+  VerificationContext validateIntegrity(Insertable<Measure> instance, {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
     if (data.containsKey('number')) {
-      context.handle(_numberMeta,
-          number.isAcceptableOrUnknown(data['number']!, _numberMeta));
+      context.handle(_numberMeta, number.isAcceptableOrUnknown(data['number']!, _numberMeta));
     } else if (isInserting) {
       context.missing(_numberMeta);
     }
     if (data.containsKey('amount')) {
-      context.handle(_amountMeta,
-          amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
+      context.handle(_amountMeta, amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
     } else if (isInserting) {
       context.missing(_amountMeta);
     }
     if (data.containsKey('timer')) {
-      context.handle(
-          _timerMeta, timer.isAcceptableOrUnknown(data['timer']!, _timerMeta));
+      context.handle(_timerMeta, timer.isAcceptableOrUnknown(data['timer']!, _timerMeta));
     } else if (isInserting) {
       context.missing(_timerMeta);
     }
@@ -231,8 +215,7 @@ class $MeasuresTable extends Measures with TableInfo<$MeasuresTable, Measure> {
   Measure map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return Measure(
-      id: attachedDatabase.options.types
-          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      id: attachedDatabase.options.types.read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       number: attachedDatabase.options.types
           .read(DriftSqlType.string, data['${effectivePrefix}number'])!,
       amount: attachedDatabase.options.types

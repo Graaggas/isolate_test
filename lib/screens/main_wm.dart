@@ -25,8 +25,7 @@ class MainWM extends WidgetModel<MainScreen, MainModel> {
         fontSize: 18,
       );
 
-  Future<void> changeIsolateToggle(bool value) =>
-      model.changeIsolateToggle(value);
+  Future<void> changeIsolateToggle(bool value) => model.changeIsolateToggle(value);
 
   void clearTable() => model.clearTable();
 

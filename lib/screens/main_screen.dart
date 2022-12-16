@@ -51,8 +51,7 @@ class MainScreen extends ElementaryWidget<MainWM> {
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(width: 1, color: Colors.black), //<-- SEE HERE
+                  borderSide: BorderSide(width: 1, color: Colors.black), //<-- SEE HERE
                 ),
               ),
             ),
@@ -122,10 +121,8 @@ class MainScreen extends ElementaryWidget<MainWM> {
                         physics: const ClampingScrollPhysics(),
                         itemBuilder: (_, index) => Table(
                           border: const TableBorder(
-                            bottom: BorderSide(
-                                width: 1,
-                                color: Colors.grey,
-                                style: BorderStyle.solid),
+                            bottom:
+                                BorderSide(width: 1, color: Colors.grey, style: BorderStyle.solid),
                           ),
                           columnWidths: const {
                             0: FlexColumnWidth(2),
@@ -136,12 +133,10 @@ class MainScreen extends ElementaryWidget<MainWM> {
                             TableRow(
                               children: [
                                 TableCell(
-                                  child:
-                                      Center(child: Text(data[index].number)),
+                                  child: Center(child: Text(data[index].number)),
                                 ),
                                 TableCell(
-                                  child:
-                                      Center(child: Text(data[index].amount)),
+                                  child: Center(child: Text(data[index].amount)),
                                 ),
                                 TableCell(
                                   child: Center(child: Text(data[index].timer)),
